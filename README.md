@@ -1,0 +1,2 @@
+# MiniBill
+Java side project
