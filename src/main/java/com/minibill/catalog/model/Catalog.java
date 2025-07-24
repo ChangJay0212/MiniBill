@@ -27,7 +27,7 @@ public class Catalog {
     @Column(nullable = false, unique = false)
     private String name;
 
-     private String description;
+    private String description;
      
 
     @Column(nullable = false, unique = false)

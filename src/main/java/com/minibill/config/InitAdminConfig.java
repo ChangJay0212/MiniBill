@@ -4,6 +4,7 @@ import com.minibill.user.repository.UserRepository;
 import com.minibill.user.repository.PermissionRepository;
 import com.minibill.user.repository.UserPermissionRepository;
 import com.minibill.user.model.User;
+import com.minibill.auth.service.JwtService;
 import com.minibill.user.model.Permission;
 import com.minibill.user.model.UserPermission;
 import org.springframework.boot.CommandLineRunner;
@@ -13,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class InitAdminConfig {
-
+    
     @Bean
     CommandLineRunner initAdmin(UserRepository userRepository,
                                 PermissionRepository permissionRepository,
@@ -27,6 +28,13 @@ public class InitAdminConfig {
                         p.setPermissionLevel(99); // 最高權限用 99
                         return permissionRepository.save(p);
                     });
+            permissionRepository.findByPermissionLevel(1)
+                    .orElseGet(() -> {
+                        Permission p = new Permission();
+                        p.setPermissionLevel(1); // 最高權限用 99
+                        return permissionRepository.save(p);
+                    });
+
 
             // 3. 建立 admin 帳號
             User admin = userRepository.findByAccount("admin").orElseGet(() -> {

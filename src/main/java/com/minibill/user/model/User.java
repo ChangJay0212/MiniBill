@@ -9,9 +9,14 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.GeneratedValue;
 import java.sql.Timestamp;
 import java.util.UUID;
+import javax.persistence.CascadeType;
+import javax.persistence.OneToMany;
+import java.util.List;
+
 
 @Entity
 @Table(name = "users")
@@ -44,6 +49,9 @@ public class User {
 
     @Column(name = "is_active")
     private Boolean active;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserPermission> userPermissions;
 
     public UUID getUuid() {
         return uuid;

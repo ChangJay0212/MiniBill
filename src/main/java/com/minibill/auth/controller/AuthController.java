@@ -1,5 +1,6 @@
 package com.minibill.auth.controller;
 
+import com.minibill.user.repository.UserPermissionRepository;
 import com.minibill.auth.dto.LoginRequest;
 import com.minibill.auth.dto.LoginResponse;
 import com.minibill.auth.dto.SignupRequest;
@@ -20,6 +21,9 @@ public class AuthController {
     private UserRepository userRepository;
 
     @Autowired
+    private UserPermissionRepository userPermissionRepository;
+
+    @Autowired
     private JwtService jwtService;
 
     @Autowired
@@ -33,8 +37,11 @@ public class AuthController {
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             return ResponseEntity.status(401).body("密碼錯誤");
         }
-
-        String token = jwtService.generateToken(user);
+        Integer permissionLevel = userPermissionRepository.findPermissionLevelByUser(user);
+        if (permissionLevel == null) {
+            return ResponseEntity.status(403).body("沒有設定權限");
+        }
+        String token = jwtService.generateToken(user, permissionLevel);
         return ResponseEntity.ok(new LoginResponse(token));
     }
     @PostMapping("/signup")

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.UUID;
+import java.util.List;
 
 @Service
 public class TransactionsService {
@@ -40,5 +41,24 @@ public class TransactionsService {
         transaction.setAmount(amount);
         transaction.setIsPaid(false); // 預設未付款
         return transactionsRepository.save(transaction);
+    }
+    // === 刪除交易 ===
+    public void deleteTransaction(UUID id) {
+        if (!transactionsRepository.existsById(id)) {
+            throw new RuntimeException("交易紀錄不存在");
+        }
+        transactionsRepository.deleteById(id);
+    }
+    public List<Transactions> getAllTransactions() {
+        return transactionsRepository.findAll();
+    }
+
+    public List<Transactions> getTransactionsByUser(UUID userId) {
+        return transactionsRepository.findByUserUuid(userId);
+    }
+
+    public Transactions getTransactionById(UUID id) {
+        return transactionsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("交易紀錄不存在"));
     }
 }

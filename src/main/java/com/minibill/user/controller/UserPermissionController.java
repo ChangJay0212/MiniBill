@@ -1,6 +1,6 @@
 package com.minibill.user.controller;
 
-import com.minibill.user.model.Permission;
+import com.minibill.security.PermissionRequired;
 import com.minibill.user.model.UserPermission;
 import com.minibill.user.service.UserPermissionService;
 import org.springframework.http.ResponseEntity;
@@ -19,22 +19,33 @@ public class UserPermissionController {
         this.userPermissionService = userPermissionService;
     }
 
-    // 新增權限
-    @PostMapping("/permissions")
-    public ResponseEntity<Permission> createPermission(@RequestParam Integer level) {
-        return ResponseEntity.ok(userPermissionService.createPermission(level));
-    }
-
-    // 指派權限給使用者
+    // === 指派權限給使用者 ===
     @PostMapping("/{userId}/permissions")
-    public ResponseEntity<String> assignPermission(@PathVariable UUID userId, @RequestParam Integer level) {
-        userPermissionService.assignPermission(userId, level);
-        return ResponseEntity.ok("已新增權限：" + level);
+    @PermissionRequired(99)
+    public ResponseEntity<String> assignPermission(@PathVariable UUID userId, @RequestParam UUID permissionId) {
+        userPermissionService.assignPermission(userId, permissionId);
+        return ResponseEntity.ok("已新增權限：" + permissionId);
     }
 
-    // 查詢使用者權限
+    // === 更新使用者權限 ===
+    @PutMapping("/{userId}/permissions")
+    @PermissionRequired(99)
+    public ResponseEntity<String> updateUserPermission(@PathVariable UUID userId, @RequestParam UUID permissionId) {
+        userPermissionService.updateUserPermission(userId, permissionId);
+        return ResponseEntity.ok("已更新使用者權限為：" + permissionId);
+    }
+
+    // === 查詢使用者權限 ===
     @GetMapping("/{userId}/permissions")
+    @PermissionRequired(99)
     public ResponseEntity<List<UserPermission>> getUserPermissions(@PathVariable UUID userId) {
         return ResponseEntity.ok(userPermissionService.getUserPermissions(userId));
+    }
+
+    // === 查詢所有使用者及權限 ===
+    @GetMapping("/permissions/all")
+    @PermissionRequired(99)
+    public ResponseEntity<List<UserPermission>> getAllUsersWithPermissions() {
+        return ResponseEntity.ok(userPermissionService.getAllUserPermissions());
     }
 }

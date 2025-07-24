@@ -48,7 +48,41 @@ public class UserPermissionService {
     public List<UserPermission> getUserPermissions(UUID userId) {
         return userPermissionRepository.findByUserUuid(userId);
     }
+    @Transactional
+    public void assignPermission(UUID userId, UUID permissionId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("使用者不存在"));
 
+        Permission permission = permissionRepository.findById(permissionId)
+                .orElseThrow(() -> new RuntimeException("權限不存在"));
+
+        // 避免重複新增
+        if (userPermissionRepository.existsByUserAndPermission(user, permission)) {
+            throw new RuntimeException("該使用者已擁有此權限");
+        }
+
+        UserPermission userPermission = new UserPermission();
+        userPermission.setUser(user);
+        userPermission.setPermission(permission);
+        userPermissionRepository.save(userPermission);
+    }
+    @Transactional
+    public void updateUserPermission(UUID userId, UUID permissionId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("使用者不存在"));
+
+        Permission permission = permissionRepository.findById(permissionId)
+                .orElseThrow(() -> new RuntimeException("權限不存在"));
+
+        // 先刪掉舊的
+        userPermissionRepository.deleteByUser(user);
+
+        // 重新建立
+        UserPermission userPermission = new UserPermission();
+        userPermission.setUser(user);
+        userPermission.setPermission(permission);
+        userPermissionRepository.save(userPermission);
+    }
     public Permission createPermission(Integer level) {
         if (permissionRepository.findByPermissionLevel(level).isPresent()) {
             throw new RuntimeException("權限已存在");
@@ -56,5 +90,24 @@ public class UserPermissionService {
         Permission p = new Permission();
         p.setPermissionLevel(level);
         return permissionRepository.save(p);
+    }
+    public List<UserPermission> getAllUserPermissions() {
+        return userPermissionRepository.findAll();
+    }
+    public void updateUserPermission(UUID userId, Integer level) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("使用者不存在"));
+
+        Permission permission = permissionRepository.findByPermissionLevel(level)
+                .orElseThrow(() -> new RuntimeException("權限不存在"));
+
+        // 先刪除舊的權限
+        userPermissionRepository.deleteByUser(user);
+
+        // 新增新權限
+        UserPermission up = new UserPermission();
+        up.setUser(user);
+        up.setPermission(permission);
+        userPermissionRepository.save(up);
     }
 }

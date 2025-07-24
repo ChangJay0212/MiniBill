@@ -1,5 +1,6 @@
 package com.minibill.catalog.service;
 
+import com.minibill.catalog.dto.CatalogUpdateRequest;
 import com.minibill.catalog.model.Catalog;
 import com.minibill.catalog.repository.CatalogRepository;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,29 @@ import java.util.UUID;
 public class CatalogService {
 
     private final CatalogRepository catalogRepository;
-
+    
     public CatalogService(CatalogRepository catalogRepository) {
         this.catalogRepository = catalogRepository;
+    }
+
+    public Catalog updateItemFields(UUID id, CatalogUpdateRequest request) {
+        Catalog existing = catalogRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("商品不存在"));
+
+        if (request.getName() != null) {
+            existing.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            existing.setDescription(request.getDescription());
+        }
+        if (request.getPrice() > 0) {  // 價格必須大於 0 才更新
+            existing.setPrice(request.getPrice());
+        }
+        if (request.getActive() != null) {
+            existing.setActive(request.getActive());
+        }
+
+        return catalogRepository.save(existing);
     }
 
     public Catalog addItem(Catalog item) {

@@ -8,6 +8,10 @@ import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import java.sql.Timestamp;
 import java.util.UUID;
+import javax.persistence.CascadeType;
+import javax.persistence.OneToMany;
+import java.util.List;
+
 
 @Entity
 @Table(name = "permission")
@@ -24,7 +28,10 @@ public class Permission {
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
     private Timestamp createdAt;
-
+    
+    @OneToMany(mappedBy = "permission", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserPermission> userPermissions;
+    
     public UUID getUuid() {
         return uuid;
     }
