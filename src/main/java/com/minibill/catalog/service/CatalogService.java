@@ -1,0 +1,42 @@
+package com.minibill.catalog.service;
+
+import com.minibill.catalog.model.Catalog;
+import com.minibill.catalog.repository.CatalogRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class CatalogService {
+
+    private final CatalogRepository catalogRepository;
+
+    public CatalogService(CatalogRepository catalogRepository) {
+        this.catalogRepository = catalogRepository;
+    }
+
+    public Catalog addItem(Catalog item) {
+        return catalogRepository.save(item);
+    }
+
+    public List<Catalog> getActiveItems() {
+        return catalogRepository.findByActiveTrue();
+    }
+
+    public Catalog updateItem(UUID id, Catalog updated) {
+        return catalogRepository.findById(id).map(item -> {
+            item.setName(updated.getName());
+            item.setDescription(updated.getDescription());
+            item.setPrice(updated.getPrice());
+            return catalogRepository.save(item);
+        }).orElseThrow(() -> new RuntimeException("找不到商品"));
+    }
+
+    public void deactivateItem(UUID id) {
+        catalogRepository.findById(id).ifPresent(item -> {
+            item.setActive(false);
+            catalogRepository.save(item);
+        });
+    }
+}

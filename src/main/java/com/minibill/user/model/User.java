@@ -69,6 +69,10 @@ public class User {
     public Boolean isActive() {
         return active;
     }   
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

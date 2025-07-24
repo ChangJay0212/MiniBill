@@ -18,7 +18,8 @@ public class Permission {
     @Column(updatable = false, nullable = false)
     private UUID uuid;
 
-    private Integer level;
+    @Column(name = "permission_level", nullable = false, unique = true)
+    private Integer permissionLevel;
 
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
@@ -27,11 +28,13 @@ public class Permission {
     public UUID getUuid() {
         return uuid;
     }
-    public Integer getLevel() {
-        return level;
+    public Integer getPermissionLevel() {
+        return permissionLevel;
     }
     public Timestamp getCreatedAt() {
         return createdAt;   
     }
-
+    public void setPermissionLevel(Integer permissionLevel) {
+        this.permissionLevel = permissionLevel;
+    }
 }

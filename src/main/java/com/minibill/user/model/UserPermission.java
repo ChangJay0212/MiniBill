@@ -1,4 +1,5 @@
 package com.minibill.user.model;
+import com.minibill.catalog.model.Catalog;
 import com.minibill.user.model.Permission;
 import com.minibill.user.model.User;
 import javax.persistence.Table;
@@ -42,6 +43,7 @@ public class UserPermission {
     public void setPermission(Permission permission) {
         this.permission = permission;
     }
+
 }
 
     
