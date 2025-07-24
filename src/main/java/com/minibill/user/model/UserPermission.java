@@ -1,7 +1,4 @@
 package com.minibill.user.model;
-import com.minibill.catalog.model.Catalog;
-import com.minibill.user.model.Permission;
-import com.minibill.user.model.User;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;

@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user_permission")
+@Table(name = "transactions")
 public class Transactions {
     @Id
     @GeneratedValue(generator = "UUID")
