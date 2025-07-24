@@ -1,0 +1,13 @@
+# MiniBill Frontend TODO
+
+- [ ] Scaffold React project using Vite (`npx create-react-app@latest frontend --template react-ts`)
+- [ ] Install Material-UI and dependencies (`npm install @mui/material @emotion/react @emotion/styled`)
+- [ ] Install react-router-dom (`npm install react-router-dom`)
+- [ ] Set up project structure (folders for pages, components, services)
+- [ ] Implement Login page (`/auth/signin`)
+- [ ] Implement Signup page (`/auth/signup`)
+- [ ] Implement Catalog view (`/catalog`)
+- [ ] Implement "My Transactions" view (`/transactions/my`)
+- [ ] (Admin) Implement "All Transactions" view (`/transactions`)
+- [ ] (Admin) Implement User management (`/users`)
+- [ ] (Admin) Implement Permission management (`/permissions`)

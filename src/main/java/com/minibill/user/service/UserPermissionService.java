@@ -1,17 +1,21 @@
 package com.minibill.user.service;
 
-import com.minibill.user.repository.PermissionRepository;
-import com.minibill.user.repository.UserPermissionRepository;
-import com.minibill.user.repository.UserRepository;
-import com.minibill.user.model.Permission;
-import com.minibill.user.model.User;
-import com.minibill.user.model.UserPermission;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.util.List;
-import java.util.UUID;
+import com.minibill.user.dto.UserPermissionDTO;
+import com.minibill.user.model.Permission;
+import com.minibill.user.model.User;
+import com.minibill.user.model.UserPermission;
+import com.minibill.user.repository.PermissionRepository;
+import com.minibill.user.repository.UserPermissionRepository;
+import com.minibill.user.repository.UserRepository;
 
 @Service
 public class UserPermissionService {
@@ -91,23 +95,55 @@ public class UserPermissionService {
         p.setPermissionLevel(level);
         return permissionRepository.save(p);
     }
-    public List<UserPermission> getAllUserPermissions() {
-        return userPermissionRepository.findAll();
+    public List<UserPermissionDTO> getAllUserPermissions(UUID currentUserId) {
+        // 獲取所有使用者，但排除當前登入的使用者
+        List<User> allUsers = userRepository.findAll();
+        List<UserPermissionDTO> result = new ArrayList<>();
+        
+        for (User user : allUsers) {
+            // 跳過當前登入的使用者，不允許修改自己的權限
+            if (user.getUuid().equals(currentUserId)) {
+                continue;
+            }
+            
+            // 查找該使用者的權限
+            Optional<UserPermission> existingPermission = userPermissionRepository.findByUser(user);
+            
+            if (existingPermission.isPresent()) {
+                // 如果有權限，建立 DTO 物件
+                UserPermission up = existingPermission.get();
+                UserPermissionDTO dto = new UserPermissionDTO(
+                    user.getUuid(),
+                    user.getAccount(),
+                    user.getName(),
+                    user.getEmail(),
+                    up.getPermission().getPermissionLevel(),
+                    up.getPermission().getUuid()
+                );
+                result.add(dto);
+            } else {
+                // 如果沒有權限，建立一個空的 DTO 物件
+                UserPermissionDTO dto = new UserPermissionDTO(
+                    user.getUuid(),
+                    user.getAccount(),
+                    user.getName(),
+                    user.getEmail(),
+                    null,
+                    null
+                );
+                result.add(dto);
+            }
+        }
+        
+        return result;
     }
-    public void updateUserPermission(UUID userId, Integer level) {
+    
+    @Transactional
+    public void removeUserPermission(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("使用者不存在"));
-
-        Permission permission = permissionRepository.findByPermissionLevel(level)
-                .orElseThrow(() -> new RuntimeException("權限不存在"));
-
-        // 先刪除舊的權限
+        
+        // 刪除該使用者的所有權限
         userPermissionRepository.deleteByUser(user);
-
-        // 新增新權限
-        UserPermission up = new UserPermission();
-        up.setUser(user);
-        up.setPermission(permission);
-        userPermissionRepository.save(up);
     }
 }
